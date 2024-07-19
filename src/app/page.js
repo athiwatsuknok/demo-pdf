@@ -3,21 +3,23 @@
 import axios from "axios";
 import { useEffect, useState } from "react";
 
+
+const initFile = {
+  fileName: "",
+  file: null,
+}
 export default function Home() {
-  const [fileName, setFileName] = useState("");
-  const [uploadLink, setUploadLink] = useState("");
-  const [file, setFile] = useState(null);
+  const [file, setFile] = useState(initFile)
 
   const getUploadLink = async () => {
-    if (fileName) {
+    if (file.fileName) {
       try {
         const body = {
           containerName: "arise-bucket-1",
-          fileName: fileName,
+          fileName: file.fileName,
         };
         const response = await axios.post("http://localhost:8080/signed-url-upload", body);
-        console.log(response.data.sasURL);
-        setUploadLink(response.data.sasURL);
+        return response.data.sasURL
       } catch (err) {
         console.log(err);
       }
@@ -25,16 +27,17 @@ export default function Home() {
   };
 
   const uploadFile = async () => {
-    if (!uploadLink || !file) {
+    if (!file.fileName) {
       console.error("Upload link or file is missing");
       return;
     }
 
     try {
-      const response = await axios.put(uploadLink, file, {
+      const uploadLink = await getUploadLink()
+      const response = await axios.put(uploadLink, file.file, {
         headers: {
           "x-ms-blob-type": "BlockBlob",
-          "Content-Type": file.type, // Ensure the content type is set to the file's type
+          "Content-Type": file.file.type, // Ensure the content type is set to the file's type
         },
       });
       console.log("File uploaded successfully", response);
@@ -45,7 +48,7 @@ export default function Home() {
 
   useEffect(() => {
     getUploadLink();
-  }, [fileName]);
+  }, [file]);
 
   return (
     <div className="bg-black h-screen w-screen flex flex-col gap-10 justify-center items-center py-10 text-white">
@@ -56,8 +59,10 @@ export default function Home() {
           accept=".png"
           className="border border-white rounded p-2 bg-black"
           onChange={(e) => {
-            setFileName(e.target.files[0].name);
-            setFile(e.target.files[0]);
+            setFile({
+              fileName: e.target.files[0].name,
+              file: e.target.files[0]
+            });
           }}
         />
         <button
