@@ -3,13 +3,13 @@
 import axios from "axios";
 import { useState } from "react";
 
-
 const initFile = {
   fileName: "",
   file: null,
-}
+  fileURL: "",
+};
 export default function Home() {
-  const [file, setFile] = useState(initFile)
+  const [file, setFile] = useState(initFile);
 
   const getUploadLink = async () => {
     if (file.fileName) {
@@ -18,8 +18,11 @@ export default function Home() {
           containerName: "arise-bucket-1",
           fileName: file.fileName,
         };
-        const response = await axios.post("http://localhost:8080/signed-url-upload", body);
-        return response.data.sasURL
+        const response = await axios.post(
+          "http://localhost:8080/signed-url-upload",
+          body
+        );
+        return response.data.sasURL;
       } catch (err) {
         console.log(err);
       }
@@ -33,7 +36,7 @@ export default function Home() {
     }
 
     try {
-      const uploadLink = await getUploadLink()
+      const uploadLink = await getUploadLink();
       const response = await axios.put(uploadLink, file.file, {
         headers: {
           "x-ms-blob-type": "BlockBlob",
@@ -52,15 +55,18 @@ export default function Home() {
       <div className="text-center flex flex-col gap-4">
         <input
           type="file"
-          accept=".png"
+          // accept=".png"
           className="border border-white rounded p-2 bg-black"
           onChange={(e) => {
+            console.log(e.target.files[0]);
             setFile({
               fileName: e.target.files[0].name,
-              file: e.target.files[0]
+              file: e.target.files[0],
+              fileURL: URL.createObjectURL(e.target.files[0]),
             });
           }}
         />
+        {file.fileURL && <iframe src={file.fileURL} width={500} height={500}></iframe>}
         <button
           className="border border-white rounded p-2 bg-black hover:bg-white hover:text-black duration-150"
           onClick={uploadFile}
