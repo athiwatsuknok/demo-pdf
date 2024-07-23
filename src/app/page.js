@@ -1,7 +1,7 @@
 "use client";
 
 import axios from "axios";
-import { useEffect, useState } from "react";
+import { useState } from "react";
 
 
 const initFile = {
@@ -45,10 +45,6 @@ export default function Home() {
       console.error("Error uploading file", err);
     }
   };
-
-  useEffect(() => {
-    getUploadLink();
-  }, [file]);
 
   return (
     <div className="bg-black h-screen w-screen flex flex-col gap-10 justify-center items-center py-10 text-white">
