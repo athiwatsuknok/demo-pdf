@@ -7,6 +7,7 @@ const initFile = {
   fileName: "",
   file: null,
   fileURL: "",
+  contentType: "",
 };
 export default function Home() {
   const [file, setFile] = useState(initFile);
@@ -15,6 +16,7 @@ export default function Home() {
     if (file.fileName) {
       try {
         const body = {
+          contentType: file.contentType,
           containerName: "arise-bucket-1",
           fileName: file.fileName,
         };
@@ -63,6 +65,7 @@ export default function Home() {
               fileName: e.target.files[0].name,
               file: e.target.files[0],
               fileURL: URL.createObjectURL(e.target.files[0]),
+              contentType: e.target.files[0].type
             });
           }}
         />
